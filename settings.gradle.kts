@@ -21,3 +21,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Gozi"
 include(":app")
+include(":core")
+include(":core:network")
+include(":core:di")
+include(":core:database")
+include(":core:preferences")
+include(":core:utils")
+include(":core:ui")
