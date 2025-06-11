@@ -2,34 +2,82 @@ package com.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.app.ui.theme.Typography
+import com.app.ui.R
 
+
+val Rubik = FontFamily(
+    Font(R.font.rubik_regular),
+    Font(R.font.rubik_bold, FontWeight.Bold)
+)
 // Set of Material typography styles to start with
-val Typography = Typography(
+fun getTypography(font: FontFamily) = Typography(
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        fontFamily = font
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+    bodyMedium = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        fontFamily = font
+    ),
+    bodySmall = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 10.sp,
+        fontFamily = font
+    ),
+    labelLarge = TextStyle(
+        fontWeight = FontWeight.W500,
+        fontSize = 14.sp,
+        fontFamily = font
+    ),
+    displayLarge = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 96.sp,
+        fontFamily = font
+    ),
+    displayMedium = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 60.sp,
+        fontFamily = font
+    ),
+    displaySmall = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 48.sp,
+        fontFamily = font
+    ),
+    headlineLarge = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 32.sp,
+        fontFamily = font
+    ),
+    headlineMedium = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 28.sp,
+        fontFamily = font
+    ),
+    headlineSmall = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 24.sp,
+        fontFamily = font
+    ),
+    titleLarge = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp,
+        fontFamily = font
+    ),
+    titleMedium = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        fontFamily = font
+    ),
+    titleSmall = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        fontFamily = font
     )
-    */
 )

@@ -10,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryColor,
@@ -51,7 +52,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun GoziTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
+    fontFamily: FontFamily = Rubik,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -64,10 +65,10 @@ fun GoziTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-
+    val typography = getTypography(fontFamily)
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = typography,
         content = content
     )
 }

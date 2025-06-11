@@ -2,7 +2,7 @@ package com.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PrimaryColor = Color(0xFF2DD1E7)
+val PrimaryColor = Color(0xFFDA1919)
 val OnPrimary = Color.White
 val SecondaryColor = Color(0xFF5F12CA)
 val TertiaryColor = SecondaryColor

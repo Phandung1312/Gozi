@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.app.gozi.presentation.dashboard.DashboardScreen
 import com.app.ui.theme.GoziTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -60,16 +61,9 @@ class MainActivity : ComponentActivity() {
         }
           setContent {
             GoziTheme {
-                MainContent(mainViewModel = mainViewModel)
+                DashboardScreen()
             }
         }
     }
 }
 
-@Composable
-fun MainContent(mainViewModel: MainViewModel) {
-    val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
-    
-    // Main app content - always show once splash is ready
-//    DashboardScreen()
-}
