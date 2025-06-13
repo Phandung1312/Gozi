@@ -5,12 +5,15 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.gozi.home.presentation.R
+import com.app.ui.resources.DrawableResources
 
 // Data class for features
 data class FeatureItem(
@@ -34,14 +37,15 @@ data class FeatureItem(
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    onFoodFeatureClick: () -> Unit = {}
 ) {
     val showMessageBox by viewModel.showMessageBox.collectAsState()
     val animatedText by viewModel.animatedText.collectAsState()    // Feature list data
     val features = remember {
         listOf(
-            FeatureItem("Ăn uống", R.drawable.food_and_dragon),
-            FeatureItem("Thể thao", R.drawable.batminton)
+            FeatureItem("Ăn uống", DrawableResources.Features.foodAndDragon),
+            FeatureItem("Thể thao", DrawableResources.Features.batminton)
         )
     }
 
@@ -63,13 +67,18 @@ fun HomeScreen(
     ) {        // Main content with scrollable feature list
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .fillMaxSize(),
             contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+            verticalArrangement = Arrangement.spacedBy(24.dp)        ) {
             items(features) { feature ->
-                FeatureCard(feature = feature)
+                FeatureCard(
+                    feature = feature,
+                    onClick = {
+                        if (feature.title == "Ăn uống") {
+                            onFoodFeatureClick()
+                        }
+                    }
+                )
             }
         }
 
@@ -144,7 +153,8 @@ fun HomeScreen(
                 contentDescription = "AI Assistant",
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(CircleShape)            )
+                    .clip(CircleShape)
+            )
         }
     }
 }
@@ -152,48 +162,58 @@ fun HomeScreen(
 @Composable
 fun FeatureCard(
     feature: FeatureItem,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-    ) {        // Title section - outside and above the card
-        Text(
-            text = feature.title,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        )
-        
-        // Card with image only
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(250.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(0.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Image section
+            // Background image
             Image(
                 painter = painterResource(id = feature.imageRes),
-                contentDescription = feature.title,
+                contentDescription = feature.title, modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // Shadow overlay for better text visibility
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.FillWidth
+                    .background(Color.Black.copy(alpha = 0.3f))
             )
+
+            // Title with arrow icon overlay
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = feature.title,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = Color.White,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = "Navigate",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }

@@ -18,6 +18,10 @@
             <option value="$PROJECT_DIR$/core/preferences" />
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/core/utils" />
+            <option value="$PROJECT_DIR$/food" />
+            <option value="$PROJECT_DIR$/food/data" />
+            <option value="$PROJECT_DIR$/food/domain" />
+            <option value="$PROJECT_DIR$/food/presentation" />
             <option value="$PROJECT_DIR$/home" />
             <option value="$PROJECT_DIR$/home/data" />
             <option value="$PROJECT_DIR$/home/domain" />
