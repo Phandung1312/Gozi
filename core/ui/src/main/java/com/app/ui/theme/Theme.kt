@@ -35,6 +35,7 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
     onPrimary = OnPrimary,
+    surface = SurfaceColor,
     secondary = SecondaryColor,
     tertiary = TertiaryColor,
     background = Color.White,
@@ -53,7 +54,7 @@ private val LightColorScheme = lightColorScheme(
 fun GoziTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     fontFamily: FontFamily = Rubik,
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Tắt dynamic color để sử dụng PrimaryColor tùy chỉnh
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

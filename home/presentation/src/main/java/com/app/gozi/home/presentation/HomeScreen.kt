@@ -1,12 +1,13 @@
-package com.app.gozi.presentation.home
+package com.app.gozi.home.presentation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -16,22 +17,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.gozi.R
+import com.app.gozi.home.presentation.R
+
+// Data class for features
+data class FeatureItem(
+    val title: String,
+    val imageRes: Int
+)
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val showMessageBox by viewModel.showMessageBox.collectAsState()
-    val animatedText by viewModel.animatedText.collectAsState()
-    
+    val animatedText by viewModel.animatedText.collectAsState()    // Feature list data
+    val features = remember {
+        listOf(
+            FeatureItem("Ăn uống", R.drawable.food_and_dragon),
+            FeatureItem("Thể thao", R.drawable.batminton)
+        )
+    }
+
     // Animation cho floating button (zoom in/out)
     val infiniteTransition = rememberInfiniteTransition(label = "buttonPulse")
     val scale by infiniteTransition.animateFloat(
@@ -43,13 +56,23 @@ fun HomeScreen(
         ),
         label = "scaleAnimation"
     )
-    
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        // Nội dung trống như yêu cầu        // Message Box
+            .background(MaterialTheme.colorScheme.surface)
+    ) {        // Main content with scrollable feature list
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            items(features) { feature ->
+                FeatureCard(feature = feature)
+            }
+        }
+
         AnimatedVisibility(
             visible = showMessageBox,
             enter = slideInHorizontally(
@@ -79,12 +102,13 @@ fun HomeScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.background
-                ),                border = BorderStroke(
-                    1.dp, 
+                ), border = BorderStroke(
+                    1.dp,
                     MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {                Column(
+            ) {
+                Column(
                     modifier = Modifier.padding(12.dp)
                 ) {
                     Text(
@@ -99,7 +123,7 @@ fun HomeScreen(
                 }
             }
         }
-        
+
         // Floating Action Button
         FloatingActionButton(
             onClick = { viewModel.onFloatingButtonClick() },
@@ -114,12 +138,61 @@ fun HomeScreen(
                 defaultElevation = 8.dp,
                 pressedElevation = 12.dp
             )
-        ) {            Image(
+        ) {
+            Image(
                 painter = painterResource(id = R.drawable.ai_ask),
                 contentDescription = "AI Assistant",
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(CircleShape)
+                    .clip(CircleShape)            )
+        }
+    }
+}
+
+@Composable
+fun FeatureCard(
+    feature: FeatureItem,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+    ) {        // Title section - outside and above the card
+        Text(
+            text = feature.title,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        )
+        
+        // Card with image only
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.primary
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
+            // Image section
+            Image(
+                painter = painterResource(id = feature.imageRes),
+                contentDescription = feature.title,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.FillWidth
             )
         }
     }

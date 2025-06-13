@@ -1,7 +1,5 @@
-package com.app.gozi.presentation.home
+package com.app.gozi.home.presentation
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,22 +24,39 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     val animatedText: StateFlow<String> = _animatedText.asStateFlow()
     
     private val fullMessage = "Xin chào! Tôi là AI Assistant của bạn. Hãy nhấn vào tôi để bắt đầu trò chuyện nhé! 🤖✨"
-    
     private var autoHideJob: Job? = null
+    private var textAnimationJob: Job? = null
+    private var isProcessingClick = false
     
     init {
         showInitialMessage()
-    }    fun onFloatingButtonClick() {
-        autoHideJob?.cancel() // Hủy auto hide nếu user click
+    }
+    
+    fun onFloatingButtonClick() {
+        // Tránh spam click
+        if (isProcessingClick) return
+        isProcessingClick = true
+        
+        // Hủy tất cả jobs đang chạy
+        autoHideJob?.cancel()
+        textAnimationJob?.cancel()
         
         if (!_showMessageBox.value) {
             _showMessageBox.value = true
             startTextAnimation()
-            startAutoHideTimer() // Bắt đầu timer mới
+            startAutoHideTimer()
         } else {
             hideMessageBox()
         }
-    }    private fun showInitialMessage() {
+        
+        // Reset flag sau một khoảng thời gian ngắn
+        viewModelScope.launch {
+            delay(300) // 300ms debounce
+            isProcessingClick = false
+        }
+    }
+
+    private fun showInitialMessage() {
         viewModelScope.launch {
             delay(5000) // Tăng delay lên 1.5s để có thời gian cho màn hình load hoàn toàn
             _showMessageBox.value = true
@@ -57,8 +72,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             hideMessageBox()
         }
     }
-      private fun startTextAnimation() {
-        viewModelScope.launch {
+
+    private fun startTextAnimation() {
+        textAnimationJob?.cancel() // Hủy animation cũ nếu có
+        textAnimationJob = viewModelScope.launch {
             _animatedText.value = ""
             delay(500) // Tăng delay cho slide animation hoàn thành
             
@@ -68,8 +85,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
-      private fun hideMessageBox() {
+
+    private fun hideMessageBox() {
         autoHideJob?.cancel() // Hủy timer khi ẩn manual
+        textAnimationJob?.cancel() // Hủy animation khi ẩn
         _showMessageBox.value = false
         _animatedText.value = ""
     }

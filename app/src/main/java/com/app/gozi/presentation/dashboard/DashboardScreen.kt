@@ -13,7 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.app.gozi.presentation.components.AnimatedBottomNavigation
 import com.app.gozi.presentation.navigation.BottomNavItem
 import com.app.gozi.presentation.group.GroupScreen
-import com.app.gozi.presentation.home.HomeScreen
+import com.app.gozi.home.presentation.HomeScreen
 import com.app.gozi.presentation.notification.NotificationScreen
 import com.app.gozi.presentation.profile.ProfileScreen
 
