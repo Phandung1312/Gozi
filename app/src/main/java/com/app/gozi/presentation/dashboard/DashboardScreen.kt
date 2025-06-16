@@ -17,6 +17,8 @@ import com.app.gozi.home.presentation.HomeScreen
 import com.app.gozi.presentation.notification.NotificationScreen
 import com.app.gozi.presentation.profile.ProfileScreen
 import com.app.gozi.food.presentation.FoodScreen
+import com.app.gozi.sport.presentation.SportScreen
+
 
 @Composable
 fun DashboardScreen(
@@ -63,7 +65,8 @@ fun DashboardScreen(
 private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
-) {    NavHost(
+) {
+    NavHost(
         navController = navController,
         startDestination = BottomNavItem.Home.route,
         modifier = modifier
@@ -72,6 +75,9 @@ private fun NavigationHost(
             HomeScreen(
                 onFoodFeatureClick = {
                     navController.navigate("food_screen")
+                },
+                onSportFeatureClick = {
+                    navController.navigate("sport_screen")
                 }
             )
         }
@@ -86,6 +92,13 @@ private fun NavigationHost(
         }
         composable("food_screen") {
             FoodScreen(
+                onBackPressed = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable("sport_screen") {
+            SportScreen(
                 onBackPressed = {
                     navController.popBackStack()
                 }

@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
@@ -7,17 +7,14 @@ plugins {
 }
 
 android {
-    namespace = "com.app.gozi"
+    namespace = "com.app.gozi.sport.presentation"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.app.gozi"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -43,12 +40,9 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
-    implementation(project(":core:di"))
-    implementation(project(":home:presentation"))
-    implementation(project(":food:presentation"))
-    implementation(project(":food:data"))
-    implementation(project(":sport:presentation"))
+    implementation(project(":sport:domain"))
     implementation(project(":sport:data"))
+    
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -71,8 +65,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation(libs.hilt.android.testing)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.androidx.core.splashscreen)
 }

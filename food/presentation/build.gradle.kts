@@ -41,6 +41,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":food:domain"))
+    implementation(project(":food:data"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

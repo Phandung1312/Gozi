@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.app.gozi.food.data"
+    namespace = "com.app.gozi.sport.domain"
     compileSdk = 35
 
     defaultConfig {
@@ -35,11 +35,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":food:domain"))
-
-    // Hilt dependencies
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    
 
 
     implementation(libs.androidx.core.ktx)

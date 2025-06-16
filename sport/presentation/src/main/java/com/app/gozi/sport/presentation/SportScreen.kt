@@ -1,6 +1,5 @@
-package com.app.gozi.food.presentation
+package com.app.gozi.sport.presentation
 
-import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
@@ -13,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,42 +27,40 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.app.gozi.food.domain.model.FoodItem
-import com.app.gozi.food.presentation.viewmodel.FoodViewModel
+import com.app.gozi.sport.domain.model.SportItem
+import com.app.gozi.sport.presentation.viewmodel.SportViewModel
 import com.app.ui.resources.DrawableResources
 
 @Composable
-fun FoodScreen(
+fun SportScreen(
     onBackPressed: () -> Unit,
     onAddPressed: () -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: FoodViewModel = hiltViewModel()
+    viewModel: SportViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     
     LaunchedEffect(Unit) {
-        viewModel.loadFoodItems()
+        viewModel.loadSportItems()
     }
+    
     val scrollProgress = remember {
         derivedStateOf {
-            val maxScrollDistance = 250.dp.value - 60.dp.value // Sửa từ 80dp thành 60dp để khớp với navigation bar
+            val maxScrollDistance = 250.dp.value - 60.dp.value
             val currentScroll = listState.firstVisibleItemScrollOffset.toFloat()
-            (currentScroll / (maxScrollDistance * 2)).coerceIn(0f, 1f) // Giảm từ 3 xuống 2 để animation nhanh hơn
+            (currentScroll / (maxScrollDistance * 2)).coerceIn(0f, 1f)
         }
     }
     
-
     val headerHeightProgress by animateFloatAsState(
         targetValue = scrollProgress.value,
         animationSpec = tween(
-//            durationMillis = 200,
             easing = EaseInOutCubic
         ),
         label = "headerHeightAnimation"
     )
     
-
     val backgroundAlpha by animateFloatAsState(
         targetValue = 1f - scrollProgress.value,
         animationSpec = tween(
@@ -73,18 +69,16 @@ fun FoodScreen(
         ),
         label = "backgroundAlphaAnimation"
     )
+
     val navigationContentColor by animateColorAsState(
-        targetValue = if (headerHeightProgress > 0.7f) {
-            Color.White
-        } else {
-            Color.White
-        },
+        targetValue = Color.White,
         animationSpec = tween(
             durationMillis = 200,
             easing = EaseInOutCubic
         ),
         label = "navigationContentColorAnimation"
     )
+    
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -96,8 +90,8 @@ fun FoodScreen(
                 .zIndex(0f)
         ) {
             Image(
-                painter = painterResource(id = DrawableResources.Features.foodAndDragon),
-                contentDescription = "Food Background",
+                painter = painterResource(id = DrawableResources.Features.batminton),
+                contentDescription = "Sport Background",
                 modifier = Modifier
                     .fillMaxSize()
                     .alpha(backgroundAlpha),
@@ -117,63 +111,36 @@ fun FoodScreen(
                         )
                     )
             )
-        }        // Scrollable Content - sẽ trượt lên trên header
+        }
+        
+        // Scrollable Content - sẽ trượt lên trên header
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .zIndex(1f), // Đảm bảo content ở trên header khi cuộn
+                .zIndex(1f),
             contentPadding = PaddingValues(
                 top = lerp(250.dp, 60.dp, headerHeightProgress), 
                 bottom = 16.dp
-            ),            verticalArrangement = Arrangement.spacedBy(0.dp) // Bỏ spacing để không có khoảng trống
+            ),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             // Item đầu tiên với background để che header khi cuộn lên  
             item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(20.dp) // Chiều cao để tạo vùng overlap
+                        .height(20.dp)
                         .background(MaterialTheme.colorScheme.background)
-                )            }
-            
-            // Search bar
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = state.searchQuery,
-                        onValueChange = { viewModel.searchFoodItems(it) },
-                        placeholder = { Text("Tìm kiếm món ăn...") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Search"
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                        )
-                    )
-                }
+                )
             }
-            
-            // Loading state
-            if (state.isLoading) {
+              // Show loading indicator
+            if (state.isLoading && state.sportItems.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(32.dp),
+                            .height(200.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -181,64 +148,44 @@ fun FoodScreen(
                 }
             }
             
-            // Error state
+            // Show error message
             state.error?.let { error ->
                 item {
-                    Box(
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(16.dp)
+                            .padding(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
                     ) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text(
-                                    text = "Lỗi",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = error,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                TextButton(
-                                    onClick = { 
-                                        viewModel.clearError()
-                                        viewModel.loadFoodItems() 
-                                    }
-                                ) {
-                                    Text("Thử lại")
-                                }
-                            }
-                        }
+                        Text(
+                            text = error,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
                     }
                 }
             }
             
-            // Food items
-            items(state.foodItems) { foodItem ->
-                FoodItemCard(
-                    foodItem = foodItem,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            items(state.sportItems) { sportItem ->
+                SportItemCard(
+                    sportItem = sportItem,
+                    modifier = Modifier.padding(
+                        start = 16.dp, 
+                        end = 16.dp, 
+                        top = 16.dp, 
+                        bottom = 16.dp
+                    )
                 )
             }
         }
-          // Fixed Navigation Bar - luôn ở trên cùng
+        
+        // Fixed Navigation Bar - luôn ở trên cùng
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .zIndex(2f), // Đảm bảo navigation bar luôn ở trên cùng
+                .zIndex(2f),
             color = Color.Black.copy(alpha = 0.3f),
         ) {
             Row(
@@ -262,7 +209,7 @@ fun FoodScreen(
                 
                 // Title
                 Text(
-                    text = "Ăn uống",
+                    text = "Thể thao",
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -288,7 +235,6 @@ fun FoodScreen(
     }
 }
 
-
 @Composable
 private fun lerp(start: androidx.compose.ui.unit.Dp,
                  stop: androidx.compose.ui.unit.Dp,
@@ -297,8 +243,8 @@ private fun lerp(start: androidx.compose.ui.unit.Dp,
 }
 
 @Composable
-private fun FoodItemCard(
-    foodItem: FoodItem,
+private fun SportItemCard(
+    sportItem: SportItem,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -317,14 +263,14 @@ private fun FoodItemCard(
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                // Title and price row
+                // Title and calories row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
                     Text(
-                        text = foodItem.name,
+                        text = sportItem.name,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
@@ -332,9 +278,7 @@ private fun FoodItemCard(
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "${
-                            foodItem.price?.toInt()
-                                .toString().replace(Regex("(\\d)(?=(\\d{3})+$)"), "$1,")}₫",
+                        text = "${sportItem.calories} cal",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
@@ -355,26 +299,28 @@ private fun FoodItemCard(
                         color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Text(
-                            text = foodItem.category,
+                            text = sportItem.category,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                     
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "⭐",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Text(
-                            text = foodItem.rating.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
+                    if (sportItem.rating > 0) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "⭐",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = sportItem.rating.toString(),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
                     }
                 }
                 
@@ -382,7 +328,7 @@ private fun FoodItemCard(
                 
                 // Description
                 Text(
-                    text = foodItem.description,
+                    text = sportItem.description,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     lineHeight = 20.sp
@@ -390,33 +336,53 @@ private fun FoodItemCard(
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                // Tags and preparation time
+                // Difficulty and duration row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (foodItem.isVegetarian) {
-                        Surface(
-                            shape = RoundedCornerShape(4.dp),
-                            color = Color(0xFF4CAF50)
-                        ) {
-                            Text(
-                                text = "🌱 Chay",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
+                    // Difficulty tag
+                    val difficultyColor = when (sportItem.difficulty) {
+                        "Dễ" -> Color(0xFF4CAF50)
+                        "Trung bình" -> Color(0xFFFF9800)
+                        "Khó" -> Color(0xFFFF5722)
+                        else -> MaterialTheme.colorScheme.primary
                     }
                     
-                    if (foodItem.isSpicy) {
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = difficultyColor
+                    ) {
+                        Text(
+                            text = sportItem.difficulty,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                    
+                    // Indoor/Outdoor tag
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = if (sportItem.isIndoor) Color(0xFF2196F3) else Color(0xFF8BC34A)
+                    ) {
+                        Text(
+                            text = if (sportItem.isIndoor) "🏠 Trong nhà" else "🌳 Ngoài trời",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                    
+                    // Team sport tag
+                    if (sportItem.isTeamSport) {
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            color = Color(0xFFFF5722)
+                            color = Color(0xFF9C27B0)
                         ) {
                             Text(
-                                text = "🌶️ Cay",
+                                text = "👥 Đội nhóm",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color.White,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -427,19 +393,28 @@ private fun FoodItemCard(
                     Spacer(modifier = Modifier.weight(1f))
                     
                     Text(
-                        text = "⏱️ ${foodItem.preparationTime} phút",
+                        text = "⏱️ ${sportItem.duration} phút",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
                 
-                // Ingredients
-                if (foodItem.ingredients.isNotEmpty()) {
+                // Equipment and benefits
+                if (sportItem.equipment.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Nguyên liệu: ${foodItem.ingredients.take(3).joinToString(", ")}${if (foodItem.ingredients.size > 3) "..." else ""}",
+                        text = "Dụng cụ: ${sportItem.equipment.take(3).joinToString(", ")}${if (sportItem.equipment.size > 3) "..." else ""}",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+                
+                if (sportItem.benefits.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Lợi ích: ${sportItem.benefits.take(2).joinToString(", ")}${if (sportItem.benefits.size > 2) "..." else ""}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                     )
                 }
             }

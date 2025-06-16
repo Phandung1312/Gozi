@@ -38,7 +38,8 @@ data class FeatureItem(
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onFoodFeatureClick: () -> Unit = {}
+    onFoodFeatureClick: () -> Unit = {},
+    onSportFeatureClick: () -> Unit = {}
 ) {
     val showMessageBox by viewModel.showMessageBox.collectAsState()
     val animatedText by viewModel.animatedText.collectAsState()    // Feature list data
@@ -70,12 +71,13 @@ fun HomeScreen(
                 .fillMaxSize(),
             contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)        ) {
-            items(features) { feature ->
-                FeatureCard(
+            items(features) { feature ->                FeatureCard(
                     feature = feature,
                     onClick = {
                         if (feature.title == "Ăn uống") {
                             onFoodFeatureClick()
+                        } else if (feature.title == "Thể thao") {
+                            onSportFeatureClick()
                         }
                     }
                 )
