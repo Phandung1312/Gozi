@@ -111,14 +111,12 @@ fun SportScreen(
                         )
                     )
             )
-        }
-        
-        // Scrollable Content - sẽ trượt lên trên header
+        }        // Scrollable Content - sẽ trượt lên trên header
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .zIndex(1f),
+                .zIndex(1f), // Chỉ giữ zIndex, bỏ background toàn bộ LazyColumn
             contentPadding = PaddingValues(
                 top = lerp(250.dp, 60.dp, headerHeightProgress), 
                 bottom = 16.dp
@@ -133,51 +131,61 @@ fun SportScreen(
                         .height(20.dp)
                         .background(MaterialTheme.colorScheme.background)
                 )
-            }
-              // Show loading indicator
+            }              // Show loading indicator
             if (state.isLoading && state.sportItems.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(200.dp)
+                            .background(MaterialTheme.colorScheme.background),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }
                 }
             }
-            
-            // Show error message
+              // Show error message
             state.error?.let { error ->
                 item {
-                    Card(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        )
+                            .background(MaterialTheme.colorScheme.background)
                     ) {
-                        Text(
-                            text = error,
-                            modifier = Modifier.padding(16.dp),
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            )
+                        ) {
+                            Text(
+                                text = error,
+                                modifier = Modifier.padding(16.dp),
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
                     }
                 }
             }
-            
-            items(state.sportItems) { sportItem ->
-                SportItemCard(
-                    sportItem = sportItem,
-                    modifier = Modifier.padding(
-                        start = 16.dp, 
-                        end = 16.dp, 
-                        top = 16.dp, 
-                        bottom = 16.dp
+              items(state.sportItems) { sportItem ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background) // Đảm bảo background cho mỗi item
+                ) {
+                    SportItemCard(
+                        sportItem = sportItem,
+                        modifier = Modifier.padding(
+                            start = 16.dp, 
+                            end = 16.dp, 
+                            top = 16.dp, 
+                            bottom = 16.dp
+                        )
                     )
-                )
+                }
             }
         }
         
@@ -247,19 +255,14 @@ private fun SportItemCard(
     sportItem: SportItem,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
@@ -408,8 +411,7 @@ private fun SportItemCard(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
-                
-                if (sportItem.benefits.isNotEmpty()) {
+                  if (sportItem.benefits.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Lợi ích: ${sportItem.benefits.take(2).joinToString(", ")}${if (sportItem.benefits.size > 2) "..." else ""}",
@@ -419,5 +421,4 @@ private fun SportItemCard(
                 }
             }
         }
-    }
 }

@@ -116,13 +116,12 @@ fun FoodScreen(
                             )
                         )
                     )
-            )
-        }        // Scrollable Content - sẽ trượt lên trên header
+            )        }        // Scrollable Content - sẽ trượt lên trên header
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .zIndex(1f), // Đảm bảo content ở trên header khi cuộn
+                .zIndex(1f), // Chỉ giữ zIndex, bỏ background toàn bộ LazyColumn
             contentPadding = PaddingValues(
                 top = lerp(250.dp, 60.dp, headerHeightProgress), 
                 bottom = 16.dp
@@ -165,8 +164,7 @@ fun FoodScreen(
                     )
                 }
             }
-            
-            // Loading state
+              // Loading state
             if (state.isLoading) {
                 item {
                     Box(
@@ -225,13 +223,18 @@ fun FoodScreen(
                     }
                 }
             }
-            
-            // Food items
+              // Food items
             items(state.foodItems) { foodItem ->
-                FoodItemCard(
-                    foodItem = foodItem,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background) // Đảm bảo background cho mỗi item
+                ) {
+                    FoodItemCard(
+                        foodItem = foodItem,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
             }
         }
           // Fixed Navigation Bar - luôn ở trên cùng
@@ -301,19 +304,14 @@ private fun FoodItemCard(
     foodItem: FoodItem,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
@@ -433,8 +431,7 @@ private fun FoodItemCard(
                     )
                 }
                 
-                // Ingredients
-                if (foodItem.ingredients.isNotEmpty()) {
+                // Ingredients                if (foodItem.ingredients.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Nguyên liệu: ${foodItem.ingredients.take(3).joinToString(", ")}${if (foodItem.ingredients.size > 3) "..." else ""}",
@@ -444,5 +441,4 @@ private fun FoodItemCard(
                 }
             }
         }
-    }
-}
+
